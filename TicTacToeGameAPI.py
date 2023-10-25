@@ -221,7 +221,7 @@ class GameAPI:
 
         return True
 
-    """def is_someone_winning(self):
+    def is_someone_winning(self):
         checks = [
             # rows
             [
@@ -290,7 +290,7 @@ class GameAPI:
                 if self.state[row * 3 + column] == 0:
                     return False
 
-        return True"""
+        return True
 
     def is_state_terminal(self):
         return is_state_terminal(self.state)

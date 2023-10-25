@@ -1,13 +1,15 @@
-import torch
 import random
-import AgentNN
-import TicTacToeGameAPI
 import sys
 
+import torch
+
+import AgentNN
+import TicTacToeGameAPI
+
 # training consts
-episodes = 100
+episodes = 5000
 discount_factor = 1
-epsilon = 0.2
+epsilon = 0.3
 
 D_x = set()
 D_y = set()
@@ -20,12 +22,18 @@ criterion = torch.nn.MSELoss()
 agent_x = AgentNN.AgentNN(True)
 agent_y = AgentNN.AgentNN(False)
 
+x_win = 0
+o_win = 0
+draw = 0
+
 # training loop
 for episode_num, episode in enumerate(range(episodes)):
     sys.stdout.write('\r')
     # the exact output you're looking for:
-    sys.stdout.write(f"%{(episode_num + 1) / episodes * 100}")
+    sys.stdout.write(f"%{(episode_num + 1) / episodes * 100}\n")
     sys.stdout.flush()
+
+    game.do_action(game.get_random_action())
 
     # collect data
     while True:
@@ -49,6 +57,13 @@ for episode_num, episode in enumerate(range(episodes)):
             D_y.add(AgentNN.Experience(current_state, executed_action, reward, next_state))
 
         if game.is_state_terminal():
+            if game.is_someone_winning() == 1:
+                x_win += 1
+            elif game.is_someone_winning() == -1:
+                o_win += 1
+            elif game.is_full():
+                draw += 1
+            print(f"X win: {x_win}, O win: {o_win}", end="")
             # game.print_state()
             game.clean()
             break
@@ -66,6 +81,8 @@ for episode_num, episode in enumerate(range(episodes)):
         loss = criterion(agent_x.forward(experience.current_state, experience.action), torch.tensor([target], dtype=torch.float))
         loss.backward()
 
+    D_x.clear()
+
     # train y
     for experience in D_y:
         game.state = experience.next_state
@@ -79,5 +96,13 @@ for episode_num, episode in enumerate(range(episodes)):
         loss = criterion(agent_y.forward(experience.current_state, experience.action), torch.tensor([target], dtype=torch.float))
         loss.backward()
 
+    D_y.clear()
 
     game.clean()
+
+torch.save({
+    'agent_x_module': agent_x.state_dict(),
+    'agent_y_module': agent_y.state_dict()
+    },
+    "./out.txt"
+)
