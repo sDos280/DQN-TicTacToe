@@ -17,9 +17,15 @@ class AgentNN(nn.Module):
     def __init__(self, is_x: bool):
         super(AgentNN, self).__init__()
         self.module = torch.nn.Sequential(
+            nn.Linear(18, 36),
+            nn.Sigmoid(),
+            nn.Linear(36, 36),
+            nn.Sigmoid(),
+            nn.Linear(36, 18),
+            nn.Sigmoid(),
             nn.Linear(18, 9),
-            nn.ReLU(),
-            nn.Linear(9, 1)
+            nn.Sigmoid(),
+            nn.Linear(9, 1),
         )
         self.is_x = is_x
 

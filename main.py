@@ -7,9 +7,9 @@ import AgentNN
 import TicTacToeGameAPI
 
 # training consts
-episodes = 5000
+episodes = 100000
 discount_factor = 1
-epsilon = 0.3
+epsilon = 0.05
 
 D_x = set()
 D_y = set()
@@ -39,7 +39,7 @@ for episode_num, episode in enumerate(range(episodes)):
     while True:
         current_state = game.state
 
-        if random.random() > 1 - epsilon:  # execute the max action
+        if 1 - epsilon > random.random():  # execute the max action
             if game.x_turn:
                 executed_action = agent_x.get_max_q_action(game)
             else:
@@ -63,7 +63,7 @@ for episode_num, episode in enumerate(range(episodes)):
                 o_win += 1
             elif game.is_full():
                 draw += 1
-            print(f"X win: {x_win}, O win: {o_win}", end="")
+            # print(f"X win: {x_win}, O win: {o_win}, Draw: {draw}", end="")
             # game.print_state()
             game.clean()
             break
@@ -99,6 +99,8 @@ for episode_num, episode in enumerate(range(episodes)):
     D_y.clear()
 
     game.clean()
+
+print(f"X win: {x_win}, O win: {o_win}, Draw: {draw}", end="")
 
 torch.save({
     'agent_x_module': agent_x.state_dict(),

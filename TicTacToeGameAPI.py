@@ -183,7 +183,7 @@ class GameAPI:
         self.x_turn = True
 
     def get_current_reward(self):
-        return reward_function(self.state, self.x_turn)
+        return reward_function(self.state, not self.x_turn)  # we do the action (which switch the turn) and only then we get the reward, so here we need to swap that again
 
     def get_all_valid_actions(self) -> list[Action]:
         valid_actions: list[Action] = []
