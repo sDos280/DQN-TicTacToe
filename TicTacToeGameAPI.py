@@ -131,3 +131,7 @@ class GameAPI:
                 return False
 
         return True
+
+    def clear(self):
+        self.board = [0] * 9
+        self.x_turn = True
