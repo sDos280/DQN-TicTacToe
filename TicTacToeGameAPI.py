@@ -22,9 +22,44 @@ class GameAPI:
             if action == 1:
                 return self.board[i]
 
-        raise RuntimeError("no high bit in action")
+        raise RuntimeError("No high bit in action (get_action_board_and)")
+
+    def get_board_reward(self) -> int:
+        """return the reward of current board based on the turn"""
+        for i in range(3):
+            # rows
+            if self.board[i * 3] == self.board[i * 3 + 1] == self.board[i * 3 + 2] != 0:
+                if self.x_turn:
+                    if self.board[i] == 1:
+                        return 100
+                    elif self.board[i] == -1:
+                        return -100
+                else:
+                    if self.board[i] == 1:
+                        return -100
+                    elif self.board[i] == -1:
+                        return 100
+
+            # columns
+            if self.board[i] == self.board[i + 3] == self.board[i + 6] != 0:
+                if self.x_turn:
+                    if self.board[i] == 1:
+                        return 100
+                    elif self.board[i] == -1:
+                        return -100
+                else:
+                    if self.board[i] == 1:
+                        return -100
+                    elif self.board[i] == -1:
+                        return 100
+
+        return 0
 
     def do_action(self, action: Action) -> int:
         """execute the action from the current board and return the reward for entering the new state"""
 
         # make sure the action is valid
+        and_cell = self.get_action_board_and(action)
+
+        if and_cell != 0:
+            raise RuntimeError("Cell is already occupied (do_action)")
