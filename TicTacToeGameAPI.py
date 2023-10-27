@@ -20,12 +20,12 @@ class GameAPI:
 
         raise RuntimeError("No high bit in action (get_action_board_and)")
 
-    def get_board_reward(self) -> int:
+    def get_board_reward(self, turn) -> int:
         """return the reward of current board based on the turn"""
         for i in range(3):
             # rows
             if self.board[i * 3] == self.board[i * 3 + 1] == self.board[i * 3 + 2] != 0:
-                if self.x_turn:
+                if turn:
                     if self.board[i] == 1:
                         return 100
                     elif self.board[i] == -1:
@@ -38,7 +38,7 @@ class GameAPI:
 
             # columns
             if self.board[i] == self.board[i + 3] == self.board[i + 6] != 0:
-                if self.x_turn:
+                if turn:
                     if self.board[i] == 1:
                         return 100
                     elif self.board[i] == -1:
@@ -64,7 +64,7 @@ class GameAPI:
 
         self.board[action_index_cell] = 1 if self.x_turn else -1
 
-        reward = self.get_board_reward()
+        reward = self.get_board_reward(self.x_turn)
 
         self.x_turn = not self.x_turn  # change the turn to the next turn
 
