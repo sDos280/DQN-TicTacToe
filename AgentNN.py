@@ -1,10 +1,8 @@
 import torch
 import torch.nn as nn
 
+import Consts
 import TicTacToeGameAPI
-
-State = tuple[int, int, int, int, int, int, int, int, int]
-Action = tuple[int, int, int, int, int, int, int, int, int]
 
 
 # a State is just a list of cells
@@ -29,13 +27,13 @@ class AgentNN(nn.Module):
         )
         self.is_x = is_x
 
-    def forward(self, state: State, action: Action):
-        input_list = list(state).copy()
-        input_list.extend(list(action))
+    def forward(self, state: Consts.State, action: Consts.Action):
+        input_list = state
+        input_list.extend(action)
 
         return self.module(torch.tensor(input_list, dtype=torch.float))
 
-    def get_max_q_action(self, game: TicTacToeGameAPI.GameAPI) -> Action:
+    def get_max_q_action(self, game: TicTacToeGameAPI.GameAPI) -> Consts.Action:
         valid_actions = game.get_all_valid_actions()
         q_over_all_valid_actions = []
 

@@ -1,7 +1,3 @@
-State = list[int, int, int, int, int, int, int, int, int]
-Action = list[int, int, int, int, int, int, int, int, int]
-
-
 # the reward of each state is:
 # * no one is winning = 0
 # if this turn is x turn:
