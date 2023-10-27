@@ -28,7 +28,7 @@ class AgentNN(nn.Module):
         self.is_x = is_x
 
     def forward(self, state: Consts.State, action: Consts.Action):
-        input_list = state
+        input_list = state.copy()
         input_list.extend(action)
 
         return self.module(torch.tensor(input_list, dtype=torch.float))
@@ -39,7 +39,7 @@ class AgentNN(nn.Module):
 
         with torch.no_grad():
             for action in valid_actions:
-                q_over_all_valid_actions.append(self.forward(game.state, action))
+                q_over_all_valid_actions.append(self.forward(game.board, action))
 
         max_q = max(q_over_all_valid_actions)
         max_q_index = q_over_all_valid_actions.index(max_q)
@@ -49,9 +49,9 @@ class AgentNN(nn.Module):
 
 
 class Experience:
-    def __init__(self, current_state: State, is_current_turn_x: bool, action: Action, reward, next_state: State):
-        self.current_state: State = current_state
+    def __init__(self, current_state: Consts.State, is_current_turn_x: bool, action: Consts.Action, reward: float, next_state: Consts.State):
+        self.current_state: Consts.State = current_state
         self.is_current_turn_x: bool = is_current_turn_x
-        self.action: Action = action
-        self.reward = reward
-        self.next_state: State = next_state
+        self.action: Consts.Action = action
+        self.reward: float = reward
+        self.next_state: Consts.State = next_state

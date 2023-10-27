@@ -6,16 +6,17 @@
 # else if this turn is o turn:
 #   x is winning = -100
 #   o is winning = 100
+import Consts
 
 class GameAPI:
     def __init__(self):
-        self.board: State = [0] * 9  # x -> 1, o -> -1, nothing -> 0
+        self.board: Consts.State = [0] * 9  # x -> 1, o -> -1, nothing -> 0
         self.x_turn = True
 
-    def get_action_board_and(self, action: Action) -> int:
+    def get_action_board_and(self, action: Consts.Action) -> int:
         """do a bit and on the board and the action and return the value in the 'on' state"""
         for i in range(9):
-            if action == 1:
+            if action[i] == 1:
                 return self.board[i]
 
         raise RuntimeError("No high bit in action (get_action_board_and)")
@@ -75,7 +76,7 @@ class GameAPI:
 
         return 0
 
-    def do_action(self, action: Action) -> int:
+    def do_action(self, action: Consts.Action) -> int:
         """execute the action from the current board and return the reward for entering the new state"""
 
         # make sure the action is valid
@@ -94,7 +95,7 @@ class GameAPI:
 
         return reward
 
-    def get_all_valid_actions(self) -> list[Action]:
+    def get_all_valid_actions(self) -> list[Consts.Action]:
         """return a list of all the valid actions from the current board"""
         valid_actions = []
 
@@ -127,7 +128,7 @@ class GameAPI:
                 return True
 
         for i in range(3):
-            if self.board[i] == i:
+            if self.board[i] == 0:
                 return False
 
         return True
