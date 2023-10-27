@@ -49,8 +49,9 @@ class AgentNN(nn.Module):
 
 
 class Experience:
-    def __init__(self, current_state: State, action: Action, reward, next_state: State):
+    def __init__(self, current_state: State, is_current_turn_x: bool, action: Action, reward, next_state: State):
         self.current_state: State = current_state
+        self.is_current_turn_x: bool = is_current_turn_x
         self.action: Action = action
         self.reward = reward
         self.next_state: State = next_state
