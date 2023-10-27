@@ -13,7 +13,7 @@ Action = list[int, int, int, int, int, int, int, int, int]
 
 class GameAPI:
     def __init__(self):
-        self.board: State = [0, ] * 9  # x -> 1, o -> -1, nothing -> 0
+        self.board: State = [0] * 9  # x -> 1, o -> -1, nothing -> 0
         self.x_turn = True
 
     def get_action_board_and(self, action: Action) -> int:
@@ -73,3 +73,16 @@ class GameAPI:
         self.x_turn = not self.x_turn  # change the turn to the next turn
 
         return reward
+
+    def get_all_valid_actions(self) -> list[Action]:
+        """return a list of all the valid actions from the current board"""
+        valid_actions = []
+
+        for i in range(9):
+            if self.board[i] == 0:
+                action = [0] * 9
+                action[i] = 1
+
+                valid_actions.append(action)
+
+        return valid_actions
