@@ -1,5 +1,5 @@
-State = tuple[int, int, int, int, int, int, int, int, int]
-Action = tuple[int, int, int, int, int, int, int, int, int]
+State = list[int, int, int, int, int, int, int, int, int]
+Action = list[int, int, int, int, int, int, int, int, int]
 
 
 # the reward of each state is:
@@ -13,7 +13,7 @@ Action = tuple[int, int, int, int, int, int, int, int, int]
 
 class GameAPI:
     def __init__(self):
-        self.board: State = (0,) * 9  # x -> 1, o -> -1, nothing -> 0
+        self.board: State = [0, ] * 9  # x -> 1, o -> -1, nothing -> 0
         self.x_turn = True
 
     def get_action_board_and(self, action: Action) -> int:
@@ -63,3 +63,13 @@ class GameAPI:
 
         if and_cell != 0:
             raise RuntimeError("Cell is already occupied (do_action)")
+
+        action_index_cell = action.index(1)
+
+        self.board[action_index_cell] = 1 if self.x_turn else -1
+
+        reward = self.get_board_reward()
+
+        self.x_turn = not self.x_turn  # change the turn to the next turn
+
+        return reward
