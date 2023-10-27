@@ -49,6 +49,30 @@ class GameAPI:
                     elif self.board[i] == -1:
                         return 100
 
+            # diagonals
+            if self.board[0] == self.board[4] == self.board[8] != 0:
+                if turn:
+                    if self.board[i] == 1:
+                        return 100
+                    elif self.board[i] == -1:
+                        return -100
+                else:
+                    if self.board[i] == 1:
+                        return -100
+                    elif self.board[i] == -1:
+                        return 100
+            elif self.board[2] == self.board[4] == self.board[6] != 0:
+                if turn:
+                    if self.board[i] == 1:
+                        return 100
+                    elif self.board[i] == -1:
+                        return -100
+                else:
+                    if self.board[i] == 1:
+                        return -100
+                    elif self.board[i] == -1:
+                        return 100
+
         return 0
 
     def do_action(self, action: Action) -> int:
@@ -82,3 +106,28 @@ class GameAPI:
                 valid_actions.append(action)
 
         return valid_actions
+
+    def is_terminal(self) -> bool:
+        """return if a board state is a terminal state, aka a win of a full board"""
+
+        # check for a win
+        for i in range(3):
+            # rows
+            if self.board[i * 3] == self.board[i * 3 + 1] == self.board[i * 3 + 2] != 0:
+                return True
+
+            # columns
+            if self.board[i] == self.board[i + 3] == self.board[i + 6] != 0:
+                return True
+
+            # diagonals
+            if self.board[0] == self.board[4] == self.board[8] != 0:
+                return True
+            elif self.board[2] == self.board[4] == self.board[6] != 0:
+                return True
+
+        for i in range(3):
+            if self.board[i] == i:
+                return False
+
+        return True
