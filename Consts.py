@@ -3,7 +3,7 @@ import math
 State = list[int, int, int, int, int, int, int, int, int]
 Action = list[int, int, int, int, int, int, int, int, int]
 
-episodes = 10_000
+episodes = 1_000
 discount_factor = 1
 
 def print_board(board):

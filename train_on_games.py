@@ -65,7 +65,7 @@ def train_on_games_experience_list(agent_x=AgentNN.AgentNN(True),
             else:
                 optimizer_y.step()
 
-        agent_x.load_state_dict(agent_x_train.state_dict())
-        agent_y.load_state_dict(agent_y_train.state_dict())
+    agent_x.load_state_dict(agent_x_train.state_dict())
+    agent_y.load_state_dict(agent_y_train.state_dict())
 
     return losses
