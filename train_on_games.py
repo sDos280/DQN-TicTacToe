@@ -21,8 +21,8 @@ def train_on_games_experience_list(agent_x=AgentNN.AgentNN(True),
     agent_y_train.load_state_dict(agent_y.state_dict())
 
     criterion = torch.nn.MSELoss()
-    optimizer_x = torch.optim.SGD(agent_x_train.parameters(), lr=0.001, momentum=0.9)
-    optimizer_y = torch.optim.SGD(agent_y_train.parameters(), lr=0.001, momentum=0.9)
+    optimizer_x = torch.optim.SGD(agent_x_train.parameters(), lr=0.01, momentum=0.2)
+    optimizer_y = torch.optim.SGD(agent_y_train.parameters(), lr=0.01, momentum=0.2)
 
     game = TicTacToeGameAPI.GameAPI()
     losses = []
@@ -49,6 +49,13 @@ def train_on_games_experience_list(agent_x=AgentNN.AgentNN(True),
                 prediction = agent_y_train.forward(game.board, games_list[i][turn].action)
 
             loss = criterion(prediction, target)
+
+            """if abs(loss.item()) > 10:
+                print()
+                Consts.print_board(games_list[i][turn].current_state)
+                Consts.print_board(games_list[i][turn].next_state)
+                print()"""
+
             loss.backward()
 
             losses.append(loss.item())
@@ -62,16 +69,3 @@ def train_on_games_experience_list(agent_x=AgentNN.AgentNN(True),
         agent_y.load_state_dict(agent_y_train.state_dict())
 
     return losses
-
-
-losses = train_on_games_experience_list()
-
-import matplotlib.pyplot as plt
-
-fig, ax = plt.subplots()
-
-ax.plot(range(len(losses)), losses)
-plt.xlabel("loss iteration")
-plt.ylabel("loss value")
-
-plt.show()

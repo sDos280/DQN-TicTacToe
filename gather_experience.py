@@ -49,6 +49,3 @@ def gather_games_experience(agent_x=AgentNN.AgentNN(True), agent_y=AgentNN.Agent
 
     with open(out_file_path, 'wb') as opener:
         pickle.dump(games_list, opener)
-
-
-gather_games_experience()
