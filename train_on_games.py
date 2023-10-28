@@ -50,7 +50,8 @@ def train_on_games_experience_list(agent_x=AgentNN.AgentNN(True),
 
             loss = criterion(prediction, target)
 
-            """if abs(loss.item()) > 10:
+            """
+            if abs(loss.item()) > 10:
                 print()
                 Consts.print_board(games_list[i][turn].current_state)
                 Consts.print_board(games_list[i][turn].next_state)
