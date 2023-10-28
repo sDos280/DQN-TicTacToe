@@ -29,7 +29,7 @@ def train_on_games_experience_list(agent_x=AgentNN.AgentNN(True),
 
     for i in range(Consts.episodes):
         for turn in range(len(games_list[i])):
-            game.board = games_list[i][turn].next_state
+            game.board = games_list[i][turn].next_state.copy()
 
             if game.is_terminal():
                 target = torch.tensor([games_list[i][turn].reward])
@@ -39,7 +39,7 @@ def train_on_games_experience_list(agent_x=AgentNN.AgentNN(True),
                 else:
                     target = torch.tensor([games_list[i][turn].reward + Consts.discount_factor * agent_y.get_max_q(game)])
 
-            game.board = games_list[i][turn].current_state
+            game.board = games_list[i][turn].current_state.copy()
 
             if games_list[i][turn].is_current_turn_x:
                 optimizer_x.zero_grad()

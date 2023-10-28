@@ -24,7 +24,7 @@ def gather_games_experience(agent_x=AgentNN.AgentNN(True), agent_y=AgentNN.Agent
         while True:
             epsilon = Consts.calculate_epsilon(turn)
 
-            current_board = game.board
+            current_board = game.board.copy()
             current_turn = game.x_turn
 
             if epsilon < random.random():  # execute the max action
@@ -38,7 +38,7 @@ def gather_games_experience(agent_x=AgentNN.AgentNN(True), agent_y=AgentNN.Agent
             reward = game.do_action(execute_action)
             turn += 1
 
-            next_board = game.board
+            next_board = game.board.copy()
 
             games_list[i].append(AgentNN.Experience(current_board, current_turn, execute_action, reward, next_board))
 
