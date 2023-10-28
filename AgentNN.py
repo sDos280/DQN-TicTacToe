@@ -41,6 +41,7 @@ class AgentNN(nn.Module):
             for action in valid_actions:
                 q_over_all_valid_actions.append(self.forward(game.board, action))
 
+        print(q_over_all_valid_actions)
         max_q = max(q_over_all_valid_actions)
 
         return max_q
