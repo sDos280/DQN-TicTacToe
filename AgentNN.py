@@ -46,7 +46,14 @@ class AgentNN(nn.Module):
         return max_q
 
     def get_max_q_action(self, game: TicTacToeGameAPI.GameAPI) -> Consts.Action:
-        max_q = self.get_max_q(game)
+        valid_actions = game.get_all_valid_actions()
+        q_over_all_valid_actions = []
+
+        with torch.no_grad():
+            for action in valid_actions:
+                q_over_all_valid_actions.append(self.forward(game.board, action))
+
+        max_q = max(q_over_all_valid_actions)
         max_q_index = q_over_all_valid_actions.index(max_q)
         max_q_action = valid_actions[max_q_index]
 
