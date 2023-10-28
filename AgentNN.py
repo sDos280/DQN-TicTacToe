@@ -69,9 +69,10 @@ class AgentNN(nn.Module):
 
 
 class Experience:
-    def __init__(self, current_state: Consts.State, is_current_turn_x: bool, action: Consts.Action, reward: float, next_state: Consts.State):
+    def __init__(self, current_state: Consts.State, is_current_turn_x: bool, action: Consts.Action, reward: float, next_state: Consts.State, is_next_state_terminal: bool):
         self.current_state: Consts.State = current_state
         self.is_current_turn_x: bool = is_current_turn_x
         self.action: Consts.Action = action
         self.reward: float = reward
         self.next_state: Consts.State = next_state
+        self.is_next_state_terminal: bool = is_next_state_terminal
