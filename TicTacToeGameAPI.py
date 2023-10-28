@@ -8,6 +8,7 @@
 #   o is winning = 100
 import Consts
 
+
 class GameAPI:
     def __init__(self):
         self.board: Consts.State = [0] * 9  # x -> 1, o -> -1, nothing -> 0
@@ -121,13 +122,14 @@ class GameAPI:
             if self.board[i] == self.board[i + 3] == self.board[i + 6] != 0:
                 return True
 
-            # diagonals
-            if self.board[0] == self.board[4] == self.board[8] != 0:
-                return True
-            elif self.board[2] == self.board[4] == self.board[6] != 0:
-                return True
+        # diagonals
+        if self.board[0] == self.board[4] == self.board[8] != 0:
+            return True
+        elif self.board[2] == self.board[4] == self.board[6] != 0:
+            return True
 
-        for i in range(3):
+        # check for full board
+        for i in range(9):
             if self.board[i] == 0:
                 return False
 
