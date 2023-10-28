@@ -21,60 +21,60 @@ class GameAPI:
 
         raise RuntimeError("No high bit in action (get_action_board_and)")
 
-    def get_board_reward(self, turn) -> int:
+    def get_board_reward(self, turn) -> float:
         """return the reward of current board based on the turn"""
         for i in range(3):
             # rows
             if self.board[i * 3] == self.board[i * 3 + 1] == self.board[i * 3 + 2] != 0:
                 if turn:
                     if self.board[i] == 1:
-                        return 100
+                        return 100.0
                     elif self.board[i] == -1:
-                        return -100
+                        return -100.0
                 else:
                     if self.board[i] == 1:
-                        return -100
+                        return -100.0
                     elif self.board[i] == -1:
-                        return 100
+                        return 100.0
 
             # columns
             if self.board[i] == self.board[i + 3] == self.board[i + 6] != 0:
                 if turn:
                     if self.board[i] == 1:
-                        return 100
+                        return 100.0
                     elif self.board[i] == -1:
-                        return -100
+                        return -100.0
                 else:
                     if self.board[i] == 1:
-                        return -100
+                        return -100.0
                     elif self.board[i] == -1:
-                        return 100
+                        return 100.0
 
             # diagonals
             if self.board[0] == self.board[4] == self.board[8] != 0:
                 if turn:
                     if self.board[i] == 1:
-                        return 100
+                        return 100.0
                     elif self.board[i] == -1:
-                        return -100
+                        return -100.0
                 else:
                     if self.board[i] == 1:
-                        return -100
+                        return -100.0
                     elif self.board[i] == -1:
-                        return 100
+                        return 100.0
             elif self.board[2] == self.board[4] == self.board[6] != 0:
                 if turn:
                     if self.board[i] == 1:
-                        return 100
+                        return 100.0
                     elif self.board[i] == -1:
-                        return -100
+                        return -100.0
                 else:
                     if self.board[i] == 1:
-                        return -100
+                        return -100.0
                     elif self.board[i] == -1:
-                        return 100
+                        return 100.0
 
-        return 0
+        return 0.0
 
     def do_action(self, action: Consts.Action) -> int:
         """execute the action from the current board and return the reward for entering the new state"""
