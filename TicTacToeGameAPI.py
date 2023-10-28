@@ -29,51 +29,51 @@ class GameAPI:
             if self.board[i * 3] == self.board[i * 3 + 1] == self.board[i * 3 + 2] != 0:
                 if turn:
                     if self.board[i] == 1:
-                        return 100.0
+                        return 1.0
                     elif self.board[i] == -1:
-                        return -100.0
+                        return -1.0
                 else:
                     if self.board[i] == 1:
-                        return -100.0
+                        return -1.0
                     elif self.board[i] == -1:
-                        return 100.0
+                        return 1.0
 
             # columns
             if self.board[i] == self.board[i + 3] == self.board[i + 6] != 0:
                 if turn:
                     if self.board[i] == 1:
-                        return 100.0
+                        return 1.0
                     elif self.board[i] == -1:
-                        return -100.0
+                        return -1.0
                 else:
                     if self.board[i] == 1:
-                        return -100.0
+                        return -1.0
                     elif self.board[i] == -1:
-                        return 100.0
+                        return 1.0
 
             # diagonals
             if self.board[0] == self.board[4] == self.board[8] != 0:
                 if turn:
                     if self.board[i] == 1:
-                        return 100.0
+                        return 1.0
                     elif self.board[i] == -1:
-                        return -100.0
+                        return -1.0
                 else:
                     if self.board[i] == 1:
-                        return -100.0
+                        return -1.0
                     elif self.board[i] == -1:
-                        return 100.0
+                        return 1.0
             elif self.board[2] == self.board[4] == self.board[6] != 0:
                 if turn:
                     if self.board[i] == 1:
-                        return 100.0
+                        return 1.0
                     elif self.board[i] == -1:
-                        return -100.0
+                        return -1.0
                 else:
                     if self.board[i] == 1:
-                        return -100.0
+                        return -1.0
                     elif self.board[i] == -1:
-                        return 100.0
+                        return 1.0
 
         return 0.0
 
