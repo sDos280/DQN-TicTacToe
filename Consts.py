@@ -1,7 +1,7 @@
 import math
 
 State = list[int, int, int, int, int, int, int, int, int]
-Action = list[int, int, int, int, int, int, int, int, int]
+Action = int  # 0 to 8
 
 episodes = 1_000
 discount_factor = 1
