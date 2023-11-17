@@ -6,6 +6,7 @@ Action = list[int, int, int, int, int, int, int, int, int]
 episodes = 1_000
 discount_factor = 1
 
+
 def print_board(board):
     print("-------")
     for x in range(3):
@@ -18,5 +19,6 @@ def print_board(board):
         print(string)
     print("-------")
 
+
 def calculate_epsilon(turn: int) -> float:
-    return min(1 / (turn * turn * math.log(turn + 1)), 1.0)
+    return min(1 / math.pow(turn * math.log(turn + 1), 2), 1.0)

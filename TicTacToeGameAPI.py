@@ -1,11 +1,11 @@
 # the reward of each state is:
 # * no one is winning = 0
 # if this turn is x turn:
-#   x is winning = 100
-#   o is winning = -100
+#   x is winning = 1
+#   o is winning = -1
 # else if this turn is o turn:
-#   x is winning = -100
-#   o is winning = 100
+#   x is winning = -1
+#   o is winning = 1
 import Consts
 
 
