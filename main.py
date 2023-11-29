@@ -63,13 +63,17 @@ def peek_action(steps_done: Consts.Action, state: torch.Tensor) -> int:
 
 
 def optimize_model():
+    if len(memory) < BATCH_SIZE:
+        return
+
     helper_game = TicTacToeGameAPI.GameAPI()
+
     for i in range(BATCH_SIZE):
         batch: Transition = memory.choice()
 
-        helper_game.board = batch.next_state.squeeze(0).tolist()
-
         if batch.next_state is None:
+            helper_game.board = batch.state.squeeze(0).tolist()
+
             board_situation: TicTacToeGameAPI.BoardSituationKind = helper_game.get_board_situation()
             if board_situation in [TicTacToeGameAPI.BoardSituationKind.O_WIN, TicTacToeGameAPI.BoardSituationKind.X_WIN]:
                 expected_state_action_value = torch.tensor([[1.0]], dtype=torch.float)
@@ -77,6 +81,8 @@ def optimize_model():
                 expected_state_action_value = torch.tensor([[0.0]], dtype=torch.float)
             state_action_value = policy_net.forward(batch.state, batch.action)
         else:
+            helper_game.board = batch.next_state.squeeze(0).tolist()
+
             possible_action_in_next_state = helper_game.get_all_valid_actions()
 
             # curate next states batch
@@ -89,12 +95,14 @@ def optimize_model():
                     target_net.forward(non_final_next_states, possible_action_in_next_state)
                 )
 
-            expected_state_action_value = (next_state_value * GAMMA) + batch.reward
+            # expected_state_action_value = (next_state_value * GAMMA) + batch.reward
+            expected_state_action_value = next_state_value
 
             state_action_value = policy_net.forward(batch.state, batch.action)
 
         # Compute Huber loss
         criterion = torch.nn.SmoothL1Loss()
+        # loss = criterion(state_action_value, expected_state_action_value)
         loss = criterion(state_action_value, expected_state_action_value)
 
         # Optimize the model
@@ -103,13 +111,6 @@ def optimize_model():
         # In-place gradient clipping
         torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
         optimizer.step()
-
-    # Optimize the model
-    optimizer.zero_grad()
-    loss.backward()
-    # In-place gradient clipping 
-    torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
-    optimizer.step()
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -128,13 +129,13 @@ else:
 
 for episode in range(episodes):
     env.clear()
-    last_observation = env.board.copy()
+    state = env.board.copy()
     # curate last observation
-    last_observation = torch.tensor(last_observation, dtype=torch.float).unsqueeze(0)
+    state = torch.tensor(state, dtype=torch.float).unsqueeze(0)
     steps_done = 0
 
     for t in count():
-        action = peek_action(steps_done, last_observation)
+        action = peek_action(steps_done, state)
 
         observation, reward, terminal = env.step(action)
 
@@ -149,7 +150,7 @@ for episode in range(episodes):
             next_state = torch.tensor(observation, dtype=torch.float32).unsqueeze(0)
 
         # Store the transition in memory
-        memory.push(last_observation, action, next_state, reward)
+        memory.push(state, action, next_state, reward)
 
         # Move to the next state
         state = next_state
@@ -157,13 +158,14 @@ for episode in range(episodes):
         # Perform one step of the optimization (on the policy network)
         optimize_model()
 
-        """# Soft update of the target network's weights
+        # Soft update of the target network's weights
         # θ′ ← τ θ + (1 −τ )θ′
         target_net_state_dict = target_net.state_dict()
         policy_net_state_dict = policy_net.state_dict()
         for key in policy_net_state_dict:
             target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key] * (1 - TAU)
-        target_net.load_state_dict(target_net_state_dict)"""
+        target_net.load_state_dict(target_net_state_dict)
+
         Consts.print_board(observation)
 
         if terminal:
