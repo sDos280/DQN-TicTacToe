@@ -72,13 +72,7 @@ def optimize_model():
         batch: Transition = memory.choice()
 
         if batch.next_state is None:
-            helper_game.board = batch.state.squeeze(0).tolist()
-
-            board_situation: TicTacToeGameAPI.BoardSituationKind = helper_game.get_board_situation()
-            if board_situation in [TicTacToeGameAPI.BoardSituationKind.O_WIN, TicTacToeGameAPI.BoardSituationKind.X_WIN]:
-                expected_state_action_value = torch.tensor([[1.0]], dtype=torch.float)
-            else:  # a draw
-                expected_state_action_value = torch.tensor([[0.0]], dtype=torch.float)
+            expected_state_action_value = batch.reward
             state_action_value = policy_net.forward(batch.state, batch.action)
         else:
             helper_game.board = batch.next_state.squeeze(0).tolist()

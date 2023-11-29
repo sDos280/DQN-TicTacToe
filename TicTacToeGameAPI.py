@@ -66,9 +66,9 @@ class GameAPI:
         board_situation: BoardSituationKind = self.get_board_situation()
 
         if board_situation in [BoardSituationKind.X_WIN, BoardSituationKind.O_WIN]:
-            return 1.0
+            return 2.0
 
-        return 0.0
+        return 1.0
 
     def step(self, action: Consts.Action) -> tuple[Consts.State, float, bool]:
         # make sure the action is valid
