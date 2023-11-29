@@ -1,11 +1,7 @@
 # the reward of each state is:
 # * no one is winning = 0
-# if this turn is x turn:
-#   x is winning = 1
-#   o is winning = -1
-# else if this turn is o turn:
-#   x is winning = -1
-#   o is winning = 1
+# if someone is winning = 1
+
 import enum
 
 import Consts
@@ -66,19 +62,11 @@ class GameAPI:
         return BoardSituationKind.NEITHER
 
     def get_board_reward(self):
-        # win -> +/-1, draw/else -> 0
+        # win -> +1, draw/else -> 0
         board_situation: BoardSituationKind = self.get_board_situation()
 
-        if board_situation == BoardSituationKind.X_WIN:
-            if self.x_turn:
-                return 1.0
-            else:
-                return -1.0
-        elif board_situation == BoardSituationKind.O_WIN:
-            if self.x_turn:
-                return -1.0
-            else:
-                return 1.0
+        if board_situation in [BoardSituationKind.X_WIN, BoardSituationKind.O_WIN]:
+            return 1.0
 
         return 0.0
 
