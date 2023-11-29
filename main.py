@@ -49,63 +49,68 @@ def peek_action(steps_done: Consts.Action, state: torch.Tensor) -> int:
             # Convert the list of lists to a PyTorch tensor
             actions = torch.tensor(actions_list)
 
-            curated_actions = actions.unsqueeze(1)
+            # curate actions
+            actions = actions.unsqueeze(1)
 
             out = policy_net.forward(
                 state.repeat(len(actions_list), 1),
-                curated_actions
+                actions
             ).argmax()
 
-            return out
+            return actions_list[out]
     else:
-        return random.randint(0, 8)
+        return random.choice(env.get_all_valid_actions())
 
 
-"""def optimize_model():
-    if len(memory) < BATCH_SIZE:
-        return
+def optimize_model():
+    helper_game = TicTacToeGameAPI.GameAPI()
+    for i in range(BATCH_SIZE):
+        batch: Transition = memory.choice()
 
-    transitions = memory.sample(BATCH_SIZE)
-    # Transpose the batch (see https://stackoverflow.com/a/19343/3343043 for
-    # detailed explanation). This converts batch-array of Transitions
-    # to Transition of batch-arrays.
-    batch = Transition(*zip(*transitions))
+        helper_game.board = batch.next_state.squeeze(0).tolist()
 
-    # Compute a mask of non-final states and concatenate the batch elements
-    # (a final state would've been the one after which simulation ended)
-    non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
-                                            batch.next_state)), dtype=torch.bool)
-    non_final_next_states = torch.cat([s for s in batch.next_state
-                                       if s is not None])
-    state_batch = torch.cat(batch.state)
-    action_batch = torch.cat(batch.action)
-    reward_batch = torch.cat(batch.reward).unsqueeze(1)
+        if batch.next_state is None:
+            board_situation: TicTacToeGameAPI.BoardSituationKind = helper_game.get_board_situation()
+            if board_situation in [TicTacToeGameAPI.BoardSituationKind.O_WIN, TicTacToeGameAPI.BoardSituationKind.X_WIN]:
+                expected_state_action_value = torch.tensor([[1.0]], dtype=torch.float)
+            else:  # a draw
+                expected_state_action_value = torch.tensor([[0.0]], dtype=torch.float)
+            state_action_value = policy_net.forward(batch.state, batch.action)
+        else:
+            possible_action_in_next_state = helper_game.get_all_valid_actions()
 
-    state_action_values = policy_net(state_batch, action_batch)
+            # curate next states batch
+            non_final_next_states = batch.next_state.repeat(len(possible_action_in_next_state), 1)
 
-    actions_list = torch.cat((torch.ones(non_final_next_states.shape[0], 1), torch.zeros(non_final_next_states.shape[0], 1)), dim=1)
-    go_to_the_right_actions = torch.cat((torch.zeros(non_final_next_states.shape[0], 1), torch.ones(non_final_next_states.shape[0], 1)), dim=1)
+            # curate possible_action_in_next_state
+            possible_action_in_next_state = torch.tensor(possible_action_in_next_state, dtype=torch.float).unsqueeze(1)
+            with torch.no_grad():
+                next_state_value = torch.max(
+                    target_net.forward(non_final_next_states, possible_action_in_next_state)
+                )
 
-    next_state_values = torch.zeros(BATCH_SIZE, 1)
-    with torch.no_grad():
-        value_for_left = target_net(non_final_next_states, go_to_the_left_actions)
-        value_for_right = target_net(non_final_next_states, go_to_the_right_actions)
+            expected_state_action_value = (next_state_value * GAMMA) + batch.reward
 
-        my_max = torch.max(value_for_left, value_for_right)
-        next_state_values[non_final_mask] = my_max
+            state_action_value = policy_net.forward(batch.state, batch.action)
 
-    expected_state_action_values = (next_state_values * GAMMA) + reward_batch
+        # Compute Huber loss
+        criterion = torch.nn.SmoothL1Loss()
+        loss = criterion(state_action_value, expected_state_action_value)
 
-    # Compute Huber loss
-    criterion = torch.nn.SmoothL1Loss()
-    loss = criterion(state_action_values, expected_state_action_values)
+        # Optimize the model
+        optimizer.zero_grad()
+        loss.backward()
+        # In-place gradient clipping
+        torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
+        optimizer.step()
 
     # Optimize the model
     optimizer.zero_grad()
     loss.backward()
     # In-place gradient clipping 
     torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
-    optimizer.step()"""
+    optimizer.step()
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -149,8 +154,8 @@ for episode in range(episodes):
         # Move to the next state
         state = next_state
 
-        """# Perform one step of the optimization (on the policy network)
-        optimize_model()"""
+        # Perform one step of the optimization (on the policy network)
+        optimize_model()
 
         """# Soft update of the target network's weights
         # θ′ ← τ θ + (1 −τ )θ′
@@ -159,3 +164,7 @@ for episode in range(episodes):
         for key in policy_net_state_dict:
             target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key] * (1 - TAU)
         target_net.load_state_dict(target_net_state_dict)"""
+        Consts.print_board(observation)
+
+        if terminal:
+            break
