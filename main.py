@@ -10,7 +10,8 @@ import TicTacToeGameAPI
 from AgentNN import AgentNN
 from ReplayMemory import ReplayMemory
 
-BATCH_SIZE = 128
+# BATCH_SIZE = 128
+BATCH_SIZE = 64
 GAMMA = 0.99
 EPS_START = 0.9
 EPS_END = 0.05
@@ -47,7 +48,7 @@ def peek_action(steps_done: Consts.Action, state: torch.Tensor) -> int:
             actions_list = env.get_all_valid_actions()
 
             # Convert the list of lists to a PyTorch tensor
-            actions = torch.tensor(actions_list)
+            actions = torch.tensor(actions_list, device=device)
 
             # curate actions
             actions = actions.unsqueeze(1)
@@ -83,11 +84,11 @@ def optimize_model():
             non_final_next_states = batch.next_state.repeat(len(possible_action_in_next_state), 1)
 
             # curate possible_action_in_next_state
-            possible_action_in_next_state = torch.tensor(possible_action_in_next_state, dtype=torch.float).unsqueeze(1)
+            possible_action_in_next_state = torch.tensor(possible_action_in_next_state, dtype=torch.float, device=device).unsqueeze(1)
             with torch.no_grad():
                 next_state_value = torch.max(
                     target_net.forward(non_final_next_states, possible_action_in_next_state)
-                )
+                ).view((1, 1))
 
             # expected_state_action_value = (next_state_value * GAMMA) + batch.reward
             expected_state_action_value = next_state_value
@@ -97,6 +98,7 @@ def optimize_model():
         # Compute Huber loss
         criterion = torch.nn.SmoothL1Loss()
         # loss = criterion(state_action_value, expected_state_action_value)
+
         loss = criterion(state_action_value, expected_state_action_value)
 
         # Optimize the model
@@ -118,6 +120,7 @@ memory = ReplayMemory(10000)
 
 if torch.cuda.is_available():
     episodes = 600
+    # episodes = 100
 else:
     episodes = 600
 
@@ -125,7 +128,7 @@ for episode in range(episodes):
     env.clear()
     state = env.board.copy()
     # curate last observation
-    state = torch.tensor(state, dtype=torch.float).unsqueeze(0)
+    state = torch.tensor(state, dtype=torch.float, device=device).unsqueeze(0)
     steps_done = 0
 
     for t in count():
@@ -134,14 +137,18 @@ for episode in range(episodes):
         observation, reward, terminal = env.step(action)
 
         # curate reward and action
-        reward = torch.tensor([[reward]], dtype=torch.float)
-        action = torch.tensor([[action]], dtype=torch.float)
+        reward = torch.tensor([[reward]], dtype=torch.float, device=device)
+        action = torch.tensor([[action]], dtype=torch.float, device=device)
 
         if terminal:
             next_state = None
         else:
             # curate observation
-            next_state = torch.tensor(observation, dtype=torch.float32).unsqueeze(0)
+            next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
+
+        """status = env.get_board_situation()
+        if status == TicTacToeGameAPI.BoardSituationKind.DRAW:
+            breakpoint()"""
 
         # Store the transition in memory
         memory.push(state, action, next_state, reward)
@@ -160,7 +167,17 @@ for episode in range(episodes):
             target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key] * (1 - TAU)
         target_net.load_state_dict(target_net_state_dict)
 
-        Consts.print_board(observation)
+        # Consts.print_board(observation)
 
         if terminal:
+            board_status = env.get_board_situation()
+            if board_status == TicTacToeGameAPI.BoardSituationKind.X_WIN:
+                x_wins += 1
+            elif board_status == TicTacToeGameAPI.BoardSituationKind.O_WIN:
+                o_wins += 1
+            elif board_status == TicTacToeGameAPI.BoardSituationKind.DRAW:
+                draws += 1
+
             break
+
+    print(f"Episode: {episode}, memory size: {len(memory)}, Draw prob: {draws / episodes}")
