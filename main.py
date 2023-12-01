@@ -102,7 +102,6 @@ def optimize_model():
     state_batch = torch.cat(batch.state)
     state_next_batch = torch.cat(batch.next_state)
     action_batch = torch.cat(batch.action)
-    reward_batch = torch.cat(batch.reward)
     allowed_actions_batch = torch.cat(batch.allowed_actions)
 
     state_action_values = policy_net.forward(state_batch, action_batch)
@@ -141,7 +140,7 @@ if torch.cuda.is_available():
     episodes = 600
     # episodes = 100
 else:
-    episodes = 600
+    episodes = 6000
 
 for episode in range(episodes):
     env.clear()
