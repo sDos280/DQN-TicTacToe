@@ -14,5 +14,10 @@ class AgentNN(torch.nn.Module):
 
     def forward(self, observation: torch.Tensor, action: torch.Tensor) -> torch.Tensor:
         inin = torch.cat((observation, action), dim=1)
+        output = self.module(inin)
 
-        return self.module(inin)
+        # Apply the condition for actions equal to -1
+        mask = (action == -1).unsqueeze(1)
+        output[mask] = -10
+
+        return output
