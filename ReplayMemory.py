@@ -1,8 +1,17 @@
 import random
 from collections import namedtuple, deque
+from dataclasses import dataclass
 
-Transition = namedtuple('Transition',
-                        ('state', 'action', 'next_state', 'reward'))
+import torch
+
+
+@dataclass
+class Transition:
+    state: torch.Tensor
+    action: torch.Tensor
+    next_state: torch.Tensor | None
+    action: torch.Tensor
+    allowed_actions: torch.Tensor | None
 
 
 class ReplayMemory:

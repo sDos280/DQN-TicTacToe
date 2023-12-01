@@ -64,13 +64,13 @@ def peek_action(steps_done: Consts.Action, state: torch.Tensor) -> int:
 
 
 def optimize_model():
-    if len(memory) < BATCH_SIZE:
+    if len(memory_no_terminal) < BATCH_SIZE:
         return
 
     helper_game = TicTacToeGameAPI.GameAPI()
 
     for i in range(BATCH_SIZE):
-        batch: Transition = memory.choice()
+        batch: Transition = memory_no_terminal.choice()
 
         if batch.next_state is None:
             expected_state_action_value = batch.reward
@@ -116,7 +116,8 @@ target_net = AgentNN().to(device)
 target_net.load_state_dict(policy_net.state_dict())
 
 optimizer = torch.optim.AdamW(policy_net.parameters(), lr=LR, amsgrad=True)
-memory = ReplayMemory(10000)
+memory_no_terminal = ReplayMemory(10000)
+memory_terminal = ReplayMemory(10000)
 
 if torch.cuda.is_available():
     episodes = 600
@@ -132,6 +133,7 @@ for episode in range(episodes):
     steps_done = 0
 
     for t in count():
+        allowed_actions = env.get_all_valid_actions()
         action = peek_action(steps_done, state)
 
         observation, reward, terminal = env.step(action)
@@ -142,16 +144,15 @@ for episode in range(episodes):
 
         if terminal:
             next_state = None
+
+            memory_terminal.push(state, action, None, reward, None)
         else:
-            # curate observation
+            # curate observation and allowed_actions
             next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
+            allowed_actions = torch.tensor([[allowed_actions]], dtype=torch.float, device=device)
 
-        """status = env.get_board_situation()
-        if status == TicTacToeGameAPI.BoardSituationKind.DRAW:
-            breakpoint()"""
-
-        # Store the transition in memory
-        memory.push(state, action, next_state, reward)
+            # Store the transition in memory_no_terminal
+            memory_no_terminal.push(state, action, next_state, reward, allowed_actions)
 
         # Move to the next state
         state = next_state
@@ -180,4 +181,4 @@ for episode in range(episodes):
 
             break
 
-    print(f"Episode: {episode}, memory size: {len(memory)}, Draw prob: {draws / episodes}")
+    print(f"Episode: {episode}, memory size: {len(memory_no_terminal)}, Draw prob: {draws / episodes}")
