@@ -1,4 +1,5 @@
 import math
+from itertools import chain, repeat, islice
 
 State = list[int, int, int, int, int, int, int, int, int]
 Action = int  # 0 to 8
@@ -22,3 +23,11 @@ def print_board(board):
 
 def calculate_epsilon(turn: int) -> float:
     return min(1 / math.pow(turn * math.log(turn + 1), 2), 1.0)
+
+
+def pad_infinite(iterable, padding=None):
+    return chain(iterable, repeat(padding))
+
+
+def pad(iterable, size, padding=None):
+    return islice(pad_infinite(iterable, padding), size)
