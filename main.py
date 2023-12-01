@@ -11,12 +11,13 @@ from AgentNN import AgentNN
 from ReplayMemory import ReplayMemory, Transition
 
 # BATCH_SIZE_NO_TERMINAL = 128
-BATCH_SIZE_TERMINAL = 15
+BATCH_SIZE_TERMINAL = 64
 BATCH_SIZE_NO_TERMINAL = BATCH_SIZE_TERMINAL * 9
 GAMMA = 0.99
 EPS_START = 0.9
 EPS_END = 0.05
-EPS_DECAY = 4
+# EPS_DECAY = 4
+EPS_DECAY = 2.5
 TAU = 0.005
 LR = 1e-4
 
@@ -69,7 +70,6 @@ def optimize_model():
     if len(memory_no_terminal) < BATCH_SIZE_NO_TERMINAL:
         return
 
-    helper_game = TicTacToeGameAPI.GameAPI()
     criterion = torch.nn.SmoothL1Loss()
 
     # batch terminal states
@@ -138,7 +138,6 @@ memory_terminal = ReplayMemory(10000)
 
 if torch.cuda.is_available():
     episodes = 600
-    # episodes = 100
 else:
     episodes = 6000
 
@@ -188,7 +187,11 @@ for episode in range(episodes):
             target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key] * (1 - TAU)
         target_net.load_state_dict(target_net_state_dict)
 
-        # Consts.print_board(observation)
+        if len(memory_no_terminal) >= 10000:
+            memory_no_terminal.memory.clear()
+
+        if len(memory_terminal) >= 10000:
+            memory_terminal.memory.clear()
 
         if terminal:
             board_status = env.get_board_situation()
@@ -201,4 +204,4 @@ for episode in range(episodes):
 
             break
 
-    print(f"Episode: {episode}, memory size: {len(memory_no_terminal)}, Draw prob: {draws / episodes}")
+    print(f"Episode: {episode}, memory size: {len(memory_terminal)}, Draw prob: {draws}")
