@@ -1,16 +1,15 @@
 import random
-from collections import namedtuple, deque
-from dataclasses import dataclass
+from collections import deque
+from typing import NamedTuple
 
 import torch
 
 
-@dataclass
-class Transition:
+class Transition(NamedTuple):
     state: torch.Tensor
     action: torch.Tensor
     next_state: torch.Tensor | None
-    action: torch.Tensor
+    reward: torch.Tensor
     allowed_actions: torch.Tensor | None
 
 
