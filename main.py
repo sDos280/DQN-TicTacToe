@@ -1,6 +1,8 @@
 import math
+import pygame
+from pygame.locals import *
 import random
-from collections import namedtuple
+import sys
 from itertools import count
 
 import torch
@@ -136,12 +138,22 @@ optimizer = torch.optim.AdamW(policy_net.parameters(), lr=LR, amsgrad=True)
 memory_no_terminal = ReplayMemory(10000)
 memory_terminal = ReplayMemory(10000)
 
+pygame.init()
+
+display = pygame.display.set_mode((300, 300))
+
 if torch.cuda.is_available():
-    episodes = 600
+    episodes = 6000
 else:
     episodes = 6000
 
 for episode in range(episodes):
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
+
+
     env.clear()
     state = env.board.copy()
     # curate last observation
