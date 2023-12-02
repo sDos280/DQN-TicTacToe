@@ -1,11 +1,11 @@
 import math
-import pygame
-from pygame.locals import *
 import random
 import sys
 from itertools import count
 
+import pygame
 import torch
+from pygame.locals import *
 
 import Consts
 import TicTacToeGameAPI
@@ -13,8 +13,8 @@ from AgentNN import AgentNN
 from ReplayMemory import ReplayMemory, Transition
 
 # BATCH_SIZE_NO_TERMINAL = 128
-BATCH_SIZE_TERMINAL = 64
-BATCH_SIZE_NO_TERMINAL = BATCH_SIZE_TERMINAL * 9
+BATCH_SIZE_NO_TERMINAL = 64
+BATCH_SIZE_TERMINAL = BATCH_SIZE_NO_TERMINAL * 9
 GAMMA = 0.99
 EPS_START = 0.9
 EPS_END = 0.05
@@ -82,6 +82,7 @@ def optimize_model():
     state_batch = torch.cat(batch.state)
     action_batch = torch.cat(batch.action)
     reward_batch = torch.cat(batch.reward)
+    # state_next_batch = torch.cat(batch.next_state)
 
     state_action_values = policy_net.forward(state_batch, action_batch)
 
@@ -143,16 +144,15 @@ pygame.init()
 display = pygame.display.set_mode((300, 300))
 
 if torch.cuda.is_available():
-    episodes = 6000
+    episodes = 60000
 else:
-    episodes = 6000
+    episodes = 1000
 
 for episode in range(episodes):
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-
 
     env.clear()
     state = env.board.copy()
@@ -171,9 +171,9 @@ for episode in range(episodes):
         action = torch.tensor([[action]], dtype=torch.float, device=device)
 
         if terminal:
-            next_state = None
+            next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
 
-            memory_terminal.push(state, action, None, reward, None)
+            memory_terminal.push(state, action, next_state, reward, None)
         else:
             # pad allowed_actions
             allowed_actions = list(Consts.pad(allowed_actions, 9, -1))
@@ -217,3 +217,8 @@ for episode in range(episodes):
             break
 
     print(f"Episode: {episode}, memory size: {len(memory_terminal)}, Draw prob: {draws}")
+
+torch.save({
+    "policy_net": policy_net.state_dict(),
+    "target_net": target_net.state_dict()
+}, "agents.pt")
