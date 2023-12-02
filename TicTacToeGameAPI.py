@@ -66,7 +66,9 @@ class GameAPI:
         board_situation: BoardSituationKind = self.get_board_situation()
 
         if board_situation in [BoardSituationKind.X_WIN, BoardSituationKind.O_WIN]:
-            return 1.0
+            return 100.0
+        elif board_situation == BoardSituationKind.DRAW:
+            return 50.0
 
         return 0.0
 

@@ -19,7 +19,8 @@ GAMMA = 0.99
 EPS_START = 0.9
 EPS_END = 0.05
 # EPS_DECAY = 4
-EPS_DECAY = 2.5
+# EPS_DECAY = 2.5
+EPS_DECAY = 5
 TAU = 0.005
 LR = 1e-4
 
@@ -113,7 +114,7 @@ def optimize_model():
         next_state_values = target_net.forward_not_terminal_batch(state_next_batch, allowed_actions_batch)
 
         my_max = torch.max(next_state_values, 1)[0]
-        next_state_values = torch.mul(my_max, -1.0)
+        next_state_values = torch.mul(my_max, -2.0)
 
     expected_state_action_values = torch.mul(next_state_values, GAMMA)
 
