@@ -40,7 +40,7 @@ for episode in range(100):
     Consts.print_board(env.board)
 
     for t in count():
-        if env.x_turn:  # player turn
+        if not env.x_turn:  # player turn
             action = input("Enter Action, 0-8: (for quiting enter q)")
             if action == "q":
                 exit()

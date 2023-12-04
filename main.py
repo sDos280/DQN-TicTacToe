@@ -18,8 +18,6 @@ BATCH_SIZE_TERMINAL = BATCH_SIZE_NO_TERMINAL * 9
 GAMMA = 0.99
 EPS_START = 0.9
 EPS_END = 0.05
-# EPS_DECAY = 4
-# EPS_DECAY = 2.5
 EPS_DECAY = 5
 TAU = 0.005
 LR = 1e-4
@@ -30,17 +28,6 @@ x_wins = 0
 o_wins = 0
 draws = 0
 episode_durations = []
-
-"""def plot_durations():
-    plt.figure(1)
-    durations_t = torch.tensor(episode_durations, dtype=torch.float)
-    plt.clf()
-    plt.title('Training...')
-    plt.xlabel('Episode')
-    plt.ylabel('Duration')
-    plt.plot(durations_t.numpy())
-
-    plt.pause(0.001)  # pause a bit so that plots are updated"""
 
 
 def peek_action(steps_done: Consts.Action, state: torch.Tensor) -> int:
@@ -147,7 +134,7 @@ display = pygame.display.set_mode((300, 300))
 if torch.cuda.is_available():
     episodes = 60000
 else:
-    episodes = 1000
+    episodes = 10000
 
 for episode in range(episodes):
     for event in pygame.event.get():
