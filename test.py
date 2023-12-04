@@ -25,7 +25,7 @@ def peek_action(state: torch.Tensor) -> int:
 
 
 policy_net = AgentNN().to(device)
-policy_net.load_state_dict(torch.load("agents.pt")["policy_net"])
+policy_net.load_state_dict(torch.load("agents.pt", map_location=device)["policy_net"])
 
 env = TicTacToeGameAPI.GameAPI()
 
